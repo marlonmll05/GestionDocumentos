@@ -3,9 +3,10 @@
 import { apiFetch } from "./client";
 
 
-interface loginInterface{
-    usuario : string,
-    password : string
+export interface loginInterface{
+    servidor : string | undefined,
+    usuario : string | undefined,
+    password : string | undefined
 }
 
 export async function login(data : loginInterface){
@@ -16,6 +17,7 @@ export async function login(data : loginInterface){
         {
             method: "POST",
             body: JSON.stringify({
+                Ip_Conexion: data.servidor,
                 Username: data.usuario,
                 PassWordUsu: data.password
             }),

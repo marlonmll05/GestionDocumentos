@@ -7,7 +7,6 @@ export async function apiFetch<T>(path : string, options : RequestInit = {}): Pr
             "Content-Type":"application/json",
             ...options.headers,
         },
-        
     });
 
     if (!response.ok) {
@@ -23,6 +22,6 @@ export async function apiFetch<T>(path : string, options : RequestInit = {}): Pr
         throw new Error(message);
     }
 
-    return response.json();5
+    return response.json();
     
 }
