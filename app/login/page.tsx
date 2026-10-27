@@ -8,16 +8,44 @@ import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import * as z from "zod";
 import { login } from "@/lib/api/auth";
 import { string } from "zod/v4";
+import { getServers, Servidor } from "@/lib/api/servidores";
+import { useEffect } from "react";
+import { getCentros } from "@/lib/api/centros";
+
+
+
 
 // Fuera del componente: así no se vuelve a crear en cada render
 const loginSchema = z.object({
+  servidor: z.string().min(1, "Selecciona un servidor"),
   usuario: z.string().min(1, "El usuario no puede estar vacío"),
-  password: z.string().min(6, "La contraseña debe tener mínimo 6 caracteres"),
+  password: z.string().min(1, "La contraseña debe tener mínimo 1 caracteres"),
 });
 
 type LoginSchema = z.infer<typeof loginSchema>;
 
+
 export default function Login() {
+
+  const [servidores, setServidores] = useState<Servidor[]>([]);
+
+  const obtenerServidores = async () =>{
+    try {
+      const res = await getServers();
+      console.log(res)
+      setServidores(res);
+    } catch (error) {
+      setErrorGeneral("No se pudo cargar la lista de servidores");
+    }
+  } 
+
+
+  useEffect(() => {
+    obtenerServidores()
+
+  }, [])
+
+
   const router = useRouter();
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
@@ -32,6 +60,7 @@ export default function Login() {
   });
 
   const onSubmit = async (data: LoginSchema) => {
+    console.log(data)
     setErrorGeneral(null);
     try {
       await login(data)
@@ -63,16 +92,22 @@ export default function Login() {
         )}
 
         <div>
-          <label htmlFor="usuario" className="mb-1 block text-sm font-semibold text-[#3f4a2e]">
+          <label htmlFor="servidor" className="mb-1 block text-sm font-semibold text-[#3f4a2e]">
             Servidor
           </label>
-          <select>
-            <option>
+          <select id="servidor" className="text-black"
+          {...register("servidor")}>
+            <option value={""}>
               --- SELECCIONA UN SERVIDOR ---
             </option>
+            {servidores.map((m) => {
+              return (<option key={m.$id} value={m.Ip_Conexion}>
+                {m.Descripcion}
+              </option>)
+            })}
           </select>
-          {errors.usuario && (
-            <p className="mt-1 text-xs text-red-600">{errors.usuario.message}</p>
+          {errors.servidor && (
+            <p className="mt-1 text-xs text-red-600">{errors.servidor.message}</p>
           )}
         </div>
 
